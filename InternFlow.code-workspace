@@ -1,4 +1,4 @@
-# Base de Dados Simplificada (Baseada no Último Diagrama)
+# Base de Dados Simplificada 
 
 DROP DATABASE IF EXISTS sistema_gestao_estagios_simplificado;
 CREATE DATABASE sistema_gestao_estagios_simplificado
@@ -7,9 +7,9 @@ CREATE DATABASE sistema_gestao_estagios_simplificado
 USE sistema_gestao_estagios_simplificado;
 
 -- ==========================================================
--- 1. USUARIOS
+-- 1. UTILIZADORES (Substitui 'usuarios')
 -- ==========================================================
-CREATE TABLE usuarios (
+CREATE TABLE utilizadores (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   email         VARCHAR(120) NOT NULL UNIQUE,
   senha_hash    VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE usuarios (
   ativo         TINYINT(1) DEFAULT 1,
   created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) COMMENT 'Usuários do sistema (aluno, professor, admin)';
+) COMMENT 'Utilizadores do sistema (aluno, professor, admin)';
 
 -- ==========================================================
 -- 2. CURSOS
@@ -34,15 +34,16 @@ CREATE TABLE cursos (
 -- ==========================================================
 CREATE TABLE estagios (
   id            INT AUTO_INCREMENT PRIMARY KEY,
-  id_aluno      INT NOT NULL, -- FK para usuarios.id (Tipo 'aluno')
+  id_aluno      INT NOT NULL, 
   nr_processo   INT NOT NULL UNIQUE,
-  id_curso      INT NOT NULL, -- FK para cursos.id
+  id_curso      INT NOT NULL,
   ano_ingresso  YEAR,
-  id_professor  INT, -- FK para usuarios.id (Tipo 'professor')
+  id_professor  INT,
   
-  FOREIGN KEY (id_aluno) REFERENCES usuarios(id)
+  -- FKs atualizadas para 'utilizadores'
+  FOREIGN KEY (id_aluno) REFERENCES utilizadores(id)
     ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY (id_professor) REFERENCES usuarios(id)
+  FOREIGN KEY (id_professor) REFERENCES utilizadores(id)
     ON DELETE SET NULL ON UPDATE CASCADE,
   FOREIGN KEY (id_curso) REFERENCES cursos(id)
     ON DELETE RESTRICT ON UPDATE CASCADE
@@ -53,7 +54,7 @@ CREATE TABLE estagios (
 -- ==========================================================
 CREATE TABLE documentos (
   id            INT AUTO_INCREMENT PRIMARY KEY,
-  id_estagio    INT NOT NULL, -- FK para estagios.id
+  id_estagio    INT NOT NULL,
   titulo        VARCHAR(150) NOT NULL,
   
   FOREIGN KEY (id_estagio) REFERENCES estagios(id)
@@ -65,14 +66,15 @@ CREATE TABLE documentos (
 -- ==========================================================
 CREATE TABLE conversas (
   id            INT AUTO_INCREMENT PRIMARY KEY,
-  id_aluno      INT NOT NULL, -- FK para usuarios.id (Tipo 'aluno')
-  id_professor  INT, -- FK para usuarios.id (Tipo 'professor')
+  id_aluno      INT NOT NULL,
+  id_professor  INT,
   mensagem      TEXT NOT NULL,
   data_envio    DATETIME DEFAULT CURRENT_TIMESTAMP,
   lido          TINYINT(1) DEFAULT 0,
   
-  FOREIGN KEY (id_aluno) REFERENCES usuarios(id)
+  -- FKs atualizadas para 'utilizadores'
+  FOREIGN KEY (id_aluno) REFERENCES utilizadores(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (id_professor) REFERENCES usuarios(id)
+  FOREIGN KEY (id_professor) REFERENCES utilizadores(id)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) COMMENT 'Mensagens trocadas entre aluno e professor';
